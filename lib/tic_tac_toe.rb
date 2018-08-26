@@ -9,7 +9,7 @@ WIN_COMBINATIONS = [
   [2,4,6]
 ]
 
-board = [" "," "," "," "," ","  "," "," "," "]
+@board = [" "," "," "," "," ","  "," "," "," "]
 
 # Helper Method
 def display_board(board)
