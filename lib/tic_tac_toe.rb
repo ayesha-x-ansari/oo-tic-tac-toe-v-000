@@ -1,5 +1,6 @@
+class TicTacToe
 WIN_COMBINATIONS = [
-  [0,1,2],
+  [0,1,2],  
   [3,4,5],
   [6,7,8],
   [0,3,6],
@@ -9,15 +10,18 @@ WIN_COMBINATIONS = [
   [2,4,6]
 ]
 
-@board = [" "," "," "," "," ","  "," "," "," "]
+def initialize(board = nil)
+  @board = Array.new(9, " ")
+end
+
 
 # Helper Method
 def display_board(board)
-  puts " #{board[0]} | #{board[1]} | #{board[2]} "
+  puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
   puts "-----------"
-  puts " #{board[3]} | #{board[4]} | #{board[5]} "
+  puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
   puts "-----------"
-  puts " #{board[6]} | #{board[7]} | #{board[8]} "
+  puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
 end
 
 #INPUT_TO_INDEX
@@ -35,8 +39,8 @@ end
 # Your #move method must take in three arguments: 1) the board array, 2) the index in the board array that the player
 # would like to fill out with an "X" or and "O", and 3) the player's character (either "X" or "O"). We previously
 # had you write this method with a default argument of "X" for the third argument, but that is no longer needed.
-def move(board, index, token)
-  board[index] = token
+def move(index, token)
+  @board[index] = token
   display_board(board)
 end
 
@@ -47,7 +51,7 @@ end
 # contains an "X" or an "O". If the position is free, the method should return false (i.e. "not taken"), otherwise
 # it will return true.
 def position_taken?(board, index)
-  !(board[index].nil? || board[index] == " ")
+  !(@board[index].nil? || @board[index] == " ")
 end
 
 # VALID_MOVE?
@@ -55,8 +59,8 @@ end
 # or nil if not. A valid move means that the submitted position is:
 # 1. Present on the game board.
 # 2. Not already filled with a token.
-def valid_move?(board, index)
-  !position_taken?(board, index) &&  index.between?(0, 8)
+def valid_move?(index)
+  !position_taken?(@board, index) &&  index.between?(0, 8)
 end
 
 #TURN
@@ -67,25 +71,26 @@ end
 # 3. Convert user input to an index
 # 4. If the move is valid, make the move and display board.
 # 5. Otherwise (that is, if the move is invalid) ask for a new position until a valid move is received.
-def turn(board)
+def turn
   valid_move  = false
   puts "Please enter 1-9:"
   user_input = gets.strip
   index = input_to_index(user_input)
-  valid_move = valid_move?(board, index)
+  valid_move = valid_move?(index)
   if valid_move
-    token = current_player(board)
-    move(board, index, token)
+    token = current_player
+    move(index, token)
+    display_board
   else
-    turn(board)
+    turn
   end
 end
 
 # TURN_COUNT
 # This method takes in an argument of the board array and returns the number of turns that have been played.
-def turn_count(board)
+def turn_count
   counter = 0
-  board.each do |board_element|
+  @board.each do |board_element|
     if board_element == "X" || board_element == "O"
        counter += 1
       # puts "Board element is: #{board_element}. Occupied elements are #{counter}"
@@ -97,8 +102,8 @@ end
 # CURRENT_PLAYER
 # The #current_player method should take in an argument of the game board and use the #turn_count method to determine
 # if it is "X"'s turn or "O"'s.
-def current_player(board)
-  counter = turn_count(board)
+def current_player
+  counter = turn_count(@board)
   if counter % 2 == 0
     return "X"
   else
@@ -111,17 +116,17 @@ end
 # tic tac toe game must allow players to take turns, checking if the game is over after every turn, and at the
 # conclusion of the game, whether because it was won or because it was a draw, reporting to the user the
 # outcome of the game. You can imagine the pseudocode:
-def play(board)
-  counter = turn_count(board)
-  until over?(board)  || counter >  10
-    turn(board)
-    over?(board)
-    counter = turn_count(board)
+def play
+  counter = turn_count(@board)
+  until over?(@board)  || counter >  10
+    turn(@board)
+    over?(@board)
+    counter = turn_count(@board)
   end
 
   # Check if game is draw or won, returns X if X won else return O if O won
-  if won?(board)
-    winner_char = winner(board)
+  if won?(@board)
+    winner_char = winner(@board)
     puts  "Congratulations #{winner_char}!"
   else
     puts  "Cat's Game!"
@@ -132,33 +137,33 @@ end
 # Your #won? method should accept a board as an argument and return false/nil if there is no win combination
 # present in the board and return the winning combination indexes as an array if there is a win. Use your
 # WIN_COMBINATIONS constant in this method.
-def won?(board)
+def won?
    WIN_COMBINATIONS.detect do |combo|
-    board[combo[0]] == board[combo[1]] &&
-    board[combo[1]] == board[combo[2]] &&
-    position_taken?(board, combo[0])
+    @board[combo[0]] == @board[combo[1]] &&
+    @board[combo[1]] == @board[combo[2]] &&
+    position_taken?(@board, combo[0])
   end
 end
 
 # FULL?
 # The #full? method should accept a board and return true if every element in the board contains either an "X" or an "O".
-def  full?(board)
-    board.none?{|x| x == "" || x == " " || x = nil}
+def  full?
+    @board.none?{|x| x == "" || x == " " || x = nil}
 end
 
 #DRAW?
 # Build a method #draw? that accepts a board and returns true if the board has not been won and is full and false if the
 # board is not won and the board is not full, and false if the board is won.
-def draw?(board)
-  if !won?(board) && full?(board)
+def draw?
+  if !won?(@board) && full?(@board)
     return true
   end
 end
 
 # OVER?
 # Build a method #over? that accepts a board and returns true if the board has been won, is a draw, or is full
-def over?(board)
-  if (won?(board) || full?(board) || draw?(board))  || (won?(board) && !full?(board))
+def over?
+  if (won?(@board) || full?(@board) || draw?(@board))  || (won?(@board) && !full?(@board))
     return true
   else
     return false
@@ -167,9 +172,9 @@ end
 
 # WINNER
 # The #winner method should accept a board and return the token, "X" or "O" that has won the game given a winning board.
-def winner(board)
-  if winner_array = won?(board)
-    return board[winner_array[0]]
+def winner
+  if winner_array = won?(@board)
+    return @board[winner_array[0]]
   else
     return nil
   end
